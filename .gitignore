@@ -12,6 +12,8 @@
 *.so
 *.dylib
 *.dll
+*.prx
+*.sprx
 
 # Fortran module files
 *.mod
@@ -26,3 +28,5 @@
 *.exe
 *.out
 *.app
+*.elf
+*.self
