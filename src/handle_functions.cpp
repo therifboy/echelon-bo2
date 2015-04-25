@@ -291,10 +291,10 @@ void noclip(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t type
 	else if (type == CALL_EXECUTE)
 	{
 		sprintButtonPressed = (cl->button_bits.array[0] & __sprint);
+		angles[ROLL] = 0;
 		if ((forwardmove = cl->sess.cmd.forwardmove) != 0)
 		{
 			angles[YAW] = cl->ps.viewangles[YAW];
-			angles[ROLL] = 0;
 			if (forwardmove < 0)
 			{
 				angles[PITCH] = cl->ps.viewangles[PITCH] + 180;
@@ -315,8 +315,6 @@ void noclip(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t type
 		if ((rightmove = cl->sess.cmd.rightmove) != 0)
 		{
 			angles[PITCH] = 0;
-			angles[ROLL] = 0;
-			right = rightmove / 128.0f;
 			if (rightmove < 0)
 			{
 				angles[YAW] = cl->ps.viewangles[YAW] + 90;
@@ -341,7 +339,7 @@ void noclip(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t type
 
 		setOrigin(noclip_t[client].parent, finalposition);
 	}
-	else
+	else if (type == CALL_STOP)
 	{
 		unlink(self);
 		deleteEnt(noclip_t[client].parent);
