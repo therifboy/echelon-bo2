@@ -1,0 +1,38 @@
+#ifndef __THREADS_H__
+#define __THREADS_H__
+
+#include "../universal/q_shared.h"
+#include "cmd.h"
+
+#include <setjmp.h>
+
+struct TraceCheckCount
+{
+	short global;
+	short (*partitions)[0x1ED0];
+	short (*partitions2)[0x1ED0];
+};
+
+typedef char cbrush_t[0x60];
+typedef char cmodel_t[0x4C];
+
+typedef struct PhysGeomList;
+
+struct TraceThreadInfo
+{
+	TraceCheckCount checkcount;
+	cbrush_t * box_brush;
+	cmodel_t * box_model;
+	PhysGeomList ** geoms;
+};
+
+struct tls_t
+{
+	int zero;
+	va_info_t* va;
+	jmp_buf* env;
+	TraceThreadInfo* data;
+	CmdArgs* cmd;
+};
+
+#endif /* __THREADS_H__ */
