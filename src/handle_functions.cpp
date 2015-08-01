@@ -776,7 +776,7 @@ void driveableRc(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t
 		setEnemyModel(vehicle, modelName); //setenemymodel( enemymodel )
 		vehicle->s.lerp.eFlags |= 0x800; //enableaimassist()
 		setOwner(vehicle, self); //setowner
-		vehicle->s.lerp.faction = (vehicle->s.lerp.faction & ~4) | gclient->sess.cs.team; //setvehicleteam( team )
+		vehicle->s.lerp.faction.teamAndOwnerIndex = (vehicle->s.lerp.faction.teamAndOwnerIndex & ~4) | gclient->sess.cs.team; //setvehicleteam( team )
 		vehicle->s.lerp.eFlags2 |= 0x20000000; //setdrawinfrared(1)
 		useVehicle(vehicle, self, 0);
 		driveableRc_t[client].car = vehicle;
