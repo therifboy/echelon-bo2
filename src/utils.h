@@ -45,6 +45,13 @@
 #define FUNCTION
 #endif
 
+#ifdef offsetof
+#undef offsetof
+#endif
+#ifndef offsetof
+#define offsetof(t, m)		(size_t)(&(((t*)0)->m))
+#endif
+
 #define HIWORD(x)	((x) >> 16)
 #define LOWORD(x)	((x) & 0xFFFF)
 

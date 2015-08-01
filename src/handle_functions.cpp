@@ -137,7 +137,7 @@ void weaponList(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t 
 	static struct
 	{
 		uint32_t weaponID;
-		hudElement* name;
+		game_hudelem_s* name;
 	}weaponList_t[12] = 
 #pragma region
 	{
@@ -159,18 +159,20 @@ void weaponList(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t 
 	gclient_s* cl = g_entities[client].client;
 	WeaponVariantDef* variantDef;
 	uint32_t weaponID = weaponList_t[client].weaponID;
+	game_hudelem_s* name = weaponList_t[client].name;
 
 	if (type == CALL_START)
 	{
 		variantDef = BG_GetWeaponVariantDef(weaponID);
-		weaponList_t[client].name = hudElement::SetText(client, variantDef->szClipName, white, black_inv, FONT_OBJECTIVE, 2.5f, 300, 200);
-		weaponList_t[client].name->ForeGround(true);
-		weaponList_t[client].name->HideWhenDead(true);
-		weaponList_t[client].name->HideWhenInMenu(true);
-		weaponList_t[client].name->HideWhenInDemo(true);
-		weaponList_t[client].name->HideWhenInScope(true);
-		weaponList_t[client].name->HideWhenInKillcam(true);
-		weaponList_t[client].name->HideWhileRemoteControlling(true);
+		name = SetText(client, variantDef->szClipName, white, black_inv, HE_FONT_OBJECTIVE, 2.5f, 300, 200);
+		ForeGround(name, true);
+		HideWhenDead(name, true);
+		HideWhenInMenu(name, true);
+		HideWhenInDemo(name, true);
+		HideWhenInScope(name, true);
+		HideWhenInKillcam(name, true);
+		HideWhileRemoteControlling(name, true);
+		weaponList_t[client].name = name;
 	}
 	else if (type == CALL_EXECUTE)
 	{
@@ -197,7 +199,7 @@ void weaponList(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t 
 
 		if (cl->button_bits.array[0] & __use)
 		{
-			weaponList_t[client].name->Clear();
+			ClearHud(name);
 			weaponList_t[client].name = NULL;
 			giveWeapon(client, weaponList_t[client].weaponID, 0);
 			weaponList_t[client].weaponID = 1;
@@ -406,7 +408,7 @@ void flyableHeli(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t
 	static struct
 	{
 		gentity_s* helicopter;
-		hudElement* hint;
+		game_hudelem_s* hint;
 		int8_t buttonHeld;
 		bool driving;
 	}flyableHeli_t[12];
@@ -435,7 +437,7 @@ void flyableHeli(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t
 		helicopter->phys.maxRollAngle = 40;
 		origin[Z] -= 1850;
 		setVehGoalPos(flyableHeli_t[client].helicopter->scr_vehicle, origin, 1);
-		flyableHeli_t[client].hint = hudElement::SetText(client, text, white_inv, black_inv, FONT_OBJECTIVE, 1.5f, 200, 200); 
+		flyableHeli_t[client].hint = SetText(client, text, white_inv, black_inv, HE_FONT_OBJECTIVE, 1.5f, 200, 200); 
 	}
 	else if (type == CALL_EXECUTE)
 	{
@@ -524,7 +526,7 @@ void flyableHeli(int32_t client, modmenu_s* menu, handle_t* handle, handleCall_t
 		G_FreeVehicle(flyableHeli_t[client].helicopter);
 		deleteEnt(flyableHeli_t[client].helicopter);
 		flyableHeli_t[client].helicopter = NULL;
-		flyableHeli_t[client].hint->Clear();
+		ClearHud(flyableHeli_t[client].hint);
 		flyableHeli_t[client].buttonHeld = 0;
 		flyableHeli_t[client].driving = false;
 		gclient->ps.otherFlags &= ~1;
@@ -931,7 +933,7 @@ void turretSpawner(int32_t client, modmenu_s* menu, handle_t* handle, handleCall
 	{
 		gentity_s* self = &g_entities[client];
 		gentity_s* turret = spawnTurret(SL_GetString("auto_turret", 0), self->r.currentOrigin, /*self->r.currentAngles,*/ "auto_gun_turret_mp");
-		printf("spawnTurret(): %p\n", turret);
+		DBGPRINTF("spawnTurret(): %p\n", turret);
 		setTurretType(turret, TURRET_SENTRY);
 		setModel(turret, "t6_wpn_turret_sentry_gun");
 	}

@@ -8,9 +8,9 @@
 
 struct TraceCheckCount
 {
-	short global;
-	short (*partitions)[0x1ED0];
-	short (*partitions2)[0x1ED0];
+	unsigned short global;
+	unsigned short *partitions;
+	unsigned short *brushes;
 };
 
 typedef char cbrush_t[0x60];

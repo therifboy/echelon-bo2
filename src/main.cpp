@@ -50,9 +50,9 @@ inline int SetupThreadData()
 	static cbrush_t box_brush;
 	static cmodel_t box_model;
 	static PhysGeomList* geoms;
-	static short partitions[0x1ED0];
-	static short partitions2[0x1ED0];
-	static TraceThreadInfo threadInfo = { { 0, &partitions, &partitions2 }, &box_brush, &box_model, &geoms };
+	static unsigned short partitions[0x1ED0];
+	static unsigned short brushes[0x1ED0];
+	static TraceThreadInfo threadInfo = { { 0, partitions, brushes }, &box_brush, &box_model, &geoms };
 	static CmdArgs cmd_args;
 	static tls_t tls = { 0, &va_buffer, &env, &threadInfo, &cmd_args };
 
@@ -69,7 +69,7 @@ inline int SetupThreadData()
 	return ret;
 }
 
-void thread_entry(uint64_t arg)
+void thread_entry(uint64_t)
 {
 	sys_timer_sleep(10);
 	cellMsgDialogOpen2(YES_NO, "Load Echelon?", DialogCallback, NULL, NULL);
@@ -164,6 +164,7 @@ extern "C" int main(int argc, char* argv[])
 	sys_ppu_thread_create(&id, thread_entry, 0, 1010, 0x10000, 0, "Echelon");
 
 #ifdef ZOMBIE_MODE
+	// Launches zombie mode instead of multiplayer
 		sys_ppu_thread_stack_t sp;
 		sys_ppu_thread_get_stack_information(&sp);
 		sys_addr_t addr = sp.pst_addr + sp.pst_size - 0x1000;

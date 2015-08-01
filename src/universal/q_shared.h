@@ -34,6 +34,19 @@ typedef vec_t vec5_t[5];
 #define VectorSet(v, x, y, z)	((v)[0]=(x), (v)[1]=(y), (v)[2]=(z))
 #define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
+union __m128
+{
+	float m128_f32[4];
+	unsigned long long m128_u64[2];
+	char m128_i8[16];
+	short m128_i16[8];
+	int m128_i32[4];
+	long long m128_i64[2];
+	char m128_u8[16];
+	unsigned short m128_u16[8];
+	unsigned int m128_u32[4];
+};
+
 // com_math.cpp
 
 GAME_EXPORT void vectoangles(const vec3_t vector, vec3_t angles);
@@ -143,16 +156,36 @@ COLLISION DETECTION
 ==============================================================
 */
 
+enum TraceHitType
+{
+	TRACE_HITTYPE_NONE = 0x0,
+	TRACE_HITTYPE_ENTITY = 0x1,
+	TRACE_HITTYPE_DYNENT_MODEL = 0x2,
+	TRACE_HITTYPE_DYNENT_BRUSH = 0x3,
+	TRACE_HITTYPE_GLASS = 0x4,
+};
+
 struct trace_t
 {
-	float normal[3]; //0x0
+	struct hybrid_vector
+	{
+	  __m128 vec;
+	}normal; //0x0
 	float fraction; //0x10
-	int surfaceFlags; //0x14
-	int contents; //0x18
-	int hitType; //0x1C
+	int sflags; //0x14
+	int cflags; //0x18
+	TraceHitType hitType; //0x1C
 	unsigned short hitId; //0x20
-		char unk2[0x1E]; //0x22
-};
+	unsigned short modelIndex; //0x22
+	unsigned short partName; //0x24
+	unsigned short boneIndex; //0x26
+	unsigned short partGroup; //0x28
+	bool allsolid; //0x2A
+	bool startsolid; //0x2B
+	bool walkable; //0x2C
+	struct cStaticModel_s *staticModel; //0x30
+	int hitPartition; //0x34
+}__attribute__((aligned(16)));
 
 //===================================================================
 
@@ -596,8 +629,12 @@ struct LerpEntityState
 	trajectory_t apos;//0x2C
 	LerpEntityStateTypeUnion u; //0x50
 	short useCount; //0x74
-	short faction; //0x76
-	int clientFields; //0x78  ? might be a struct of size 4
+	union
+	{
+		char iHeadIconTeam;
+		short teamAndOwnerIndex;
+	}faction; //0x76
+	unsigned int clientFields; //0x78
 };
 
 struct entityState_s

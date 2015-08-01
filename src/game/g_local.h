@@ -43,7 +43,7 @@ struct gentity_s
 	char nopickup; //0x171
 	char handler; //0x172
 	char team; //0x173
-		char unk_174[2]; //0x174
+	char avoidHandle; //0x174
 	unsigned short classname; //0x176
 	unsigned short target; //0x178
 	unsigned short targetname; //0x17A
@@ -61,20 +61,43 @@ struct gentity_s
 	int health; //0x1A8
 	int maxhealth; //0x1AC
 	int damage; //0x1B0
-		char unk_1B4[0x74]; //0x1B4
+	flame_timed_damage_t flame_timed_damage[4];
+	int last_timed_radius_damage; //0x224
 	int count; //0x228
-		char unk_22C[0x60]; //0x22C
+	union
+	{
+		item_ent_t item[2];
+		trigger_ent_t trigger;
+		mover_ent_t mover;
+		corpse_ent_t corpse;
+		missile_ent_t missile;
+		blend_ent_t blend;
+		actor_ent_t actorInfo;
+		spawner_ent_t spawner;
+		zbarrier_ent_t zbarrier;
+	}; //0x22C
 	EntHandle missileTargetEnt; //0x28C
-		char unk_290[0x14]; //0x290
+	struct
+	{
+		unsigned short notifyString; //0x290
+		unsigned int index; //0x294
+		char stoppable; //0x298
+		int basetime; //0x29C
+		int duration; //0x2A0
+	}snd_wait; //0x290
 	struct tagInfo_s* tagInfo; //0x2A4
 	gentity_s *tagChildren; //0x2A8
 	unsigned short attachModelNames[19]; //0x2AC
 	unsigned short attachTagNames[19]; //0x2D2
 	struct XAnimTree_s *pAnimTree;//0x2F8
-		char unk_2FC[0x10]; //0x2FC
+	unsigned short disconnectedLinks; //0x2FC
+	int iDisconnectTime; //0x300
+	int useCount; //0x304
+	int physObjId; //0x308
 	gentity_s *nextFree; //0x30C
 	int birthtime; //0x310
-		char unk_314[8]; //0x314
+	int ikPlayerclipTerrainTime; //0x314
+	int ikDisableTerrainMappingTime; //0x318
 };
 
 enum clientConnected_t
@@ -115,6 +138,12 @@ struct score_s
 	int currentStreak;
 };
 
+struct netUInt64
+{
+	unsigned int high; //0x0
+	unsigned int low; //0x4
+};
+
 struct clientState_s
 {
 	int clientIndex; //0x0
@@ -134,32 +163,20 @@ struct clientState_s
 	int beingRevived; //0x7C
 	union
 	{
-		long long value64;
-		struct
-		{
-			int high;
-			int low;
-		}value32;
-	}xuid64; //0x80
+		unsigned long long xuid;
+		netUInt64 xuid64;
+	}; //0x80
 	union
 	{
-		long long value64;
-		struct
-		{
-			int high;
-			int low;
-		}value32;
-	}leagueTeamID64; //0x88
+		unsigned long long leagueTeamID;
+		netUInt64 leagueTeamID64;
+	}; //0x88
 	int leagueDivisionID; //0x90
 	union
 	{
-		long long value64;
-		struct
-		{
-			int high;
-			int low;
-		}value32;
-	}leagueSubdivisionID64; //0x98
+		unsigned long long leagueSubdivisionID;
+		netUInt64 leagueSubdivisionID64;
+	}; //0x98
 	int leagueSubdivisionRank; //0xA0
 	int perks[2]; //0xA4
 	int voiceConnectivityBits; //0xAC
@@ -227,10 +244,10 @@ struct gclient_s
 	int spectatorClient; //0x5690
 	int flags; //0x5694
 	int lastCmdTime; //0x5698
-	bitarray<51> button_bits; //0x569C
-	bitarray<51> oldbutton_bits; //0x56A4
-	bitarray<51> latched_button_bits; //0x56AC
-	bitarray<51> button_bitsSinceLastFrame; //0x56B4
+	bitarray<64> button_bits; //0x569C
+	bitarray<64> oldbutton_bits; //0x56A4
+	bitarray<64> latched_button_bits; //0x56AC
+	bitarray<64> button_bitsSinceLastFrame; //0x56B4
 	float fGunPitch; //0x56BC
 	float fGunYaw; //0x56C0
 	int damage_blood; //0x56C4
@@ -251,7 +268,8 @@ struct gclient_s
 	bool link_useBaseAnglesForViewClamp; //0x570B
 	float linkAnglesFrac; //0x570C
 	viewClampState link_viewClamp; //0x5710
-	EntHandle useHoldEntity; //0x5754
+	EntHandle useHoldEntity; //0x5750
+	int useHoldTime; //0x5754
 	int useButtonDone; //0x5758
 	int iLastCompassPlayerInfoEnt; //0x575C
 	int compassPingTime; //0x5760
@@ -347,16 +365,8 @@ struct MatchState
 	int index; //0x0
 	ArchivedMatchState archivedState; //0x4
 	UnarchivedMatchState unarchivedState; //0x34
-};
-
-struct com_parse_mark_t
-{
-	int lines; //0x0
-	const char *text; //0x4
-	int ungetToken; //0x8
-	int backup_lines; //0xC
-	const char *backup_text; //0x10
-};
+	unsigned int pad[1]; //0x78
+}__attribute__((aligned(8)));
 
 struct level_locals_t
 {
@@ -367,7 +377,9 @@ struct level_locals_t
 	gentity_s* firstFreeEnt; //0x10
 	gentity_s* lastFreeEnt; //0x14
 	struct scr_vehicle_s *vehicles; //0x18
-		char unk_1C[0xC]; //0x1C
+	gentity_s *firstFreeActor; //0x1C
+	gentity_s *lastFreeActor; //0x20
+	int num_actors; //0x24
 	struct sentient_s *sentients; //0x28
 	struct actor_s *actors; //0x2C
 	int actorCorpseCount; //0x30
@@ -377,7 +389,7 @@ struct level_locals_t
 	int initializing; //0x40
 	int clientIsSpawning; //0x44
 	int maxclients; //0x48
-		char unk_4C[0x48]; //0x4C
+	int teamSortedClients[18]; //0x4C
 	objective_t objectives[0x20]; //0x94
 	int objectivesClientMask[32][2]; //0x694
 	int framenum; //0x794
@@ -388,26 +400,60 @@ struct level_locals_t
 	SpawnVar spawnVar; //0x7A8
 	EntHandle droppedWeaponCue[0x20]; //0x11B4
 	int savepersist; //0x1234
-		char unk_1238[0x10]; //0x1238
+	float fFogOpaqueDist; //0x1238
+	float fFogOpaqueDistSqrd; //0x123C
+	int bPlayerIgnoreRadiusDamage; //0x1240
+	int bPlayerIgnoreRadiusDamageLatched; //0x1244
 	int currentEntityThink; //0x1248
-		char unk_124C[0x188C]; //0x124C
+	int registerWeapons; //0x124C
+	int bRegisterItems; //0x1250
+	int bRegisterLeaderboards; //0x1254
+	struct cached_tag_mat_t
+	{
+		int time; //0x0
+		int entnum; //0x4
+		unsigned short name; //0x8
+		vec3_t tagMat[4]; //0xC
+	}cachedTagMat; //0x1258
+	cached_tag_mat_t cachedEntTargetTagMat; //0x1294
+	struct trigger_info_t
+	{
+		unsigned short entnum; //0x0
+		unsigned short otherEntnum; //0x2
+		int useCount; //0x4
+		int otherUseCount; //0x8
+	}pendingTriggerList[256]; //0x12D0
+	trigger_info_t currentTriggerList[256]; //0x1ED0
+	int pendingTriggerListSize; //0x2AD0
+	int currentTriggerListSize; //0x2AD4
 	int openScriptIOFileHandles[1]; //0x2AD8
 	char *openScriptIOFileBuffers[1]; //0x2ADC
-	com_parse_mark_t currentScriptIOLineMark[1]; //0x2AE0
+	struct com_parse_mark_t
+	{
+		int lines; //0x0
+		const char *text; //0x4
+		int ungetToken; //0x8
+		int backup_lines; //0xC
+		const char *backup_text; //0x10
+	}currentScriptIOLineMark[1]; //0x2AE0
 	int scriptPrintChannel; //0x2AF4
 	float compassMapUpperLeft[2]; //0x2AF8
 	float compassMapWorldSize[2]; //0x2B00
 	float compassNorth[2]; //0x2B08
 	int finished; //0x2B10
 	int manualNameChange; //0x2B14
-		char unk_2B18[0x404]; //0x2B18
+	unsigned short modelMap[512]; //0x2B18
+	int disable_grenade_suicide; //0x2F18
 	int numConnectedClients; //0x2F1C
 	int sortedClients[18]; //0x2F20
 	int bUpdateScoresForIntermission; //0x2F68
 	int numVotingClients; //0x2F6C
-		char unk_2F70[0x10]; //0x2F70
-	MatchState matchState; //0x2F80
-		char unk_2FF8[0xAC]; //0x2FF8
+	MatchState matchState __attribute__((aligned(32))); //0x2F80
+	int teamScores[10]; //0x3000
+	int lastTeammateHealthTime; //0x3028
+	unsigned int teamHasSpyplane[10]; //0x302C
+	unsigned int teamHasSatellite[10]; //0x3054
+	unsigned int teamHasMeat[10]; //0x307C
 	char voteString[0x400]; //0x30A4
 	char voteDisplayString[0x400]; //0x34A4
 	int voteTime; //0x38A4
@@ -416,20 +462,40 @@ struct level_locals_t
 	int voteNo; //0x38B0
 	int currentActorClone; //0x38B4
 	int iSearchFrame; //0x38B8
-	struct
+	struct sv_FxVisBlock_t
 	{
-		gentity_s* ent;
-		float sight;
-	}sightBlock[32]; //0x38BC
+		gentity_s* fxEnt;
+		float radius;
+	}fxVisibilityEnts[32]; //0x38BC
 	int currentPlayerClone; //0x39BC
-		char pad[0x6640]; //0x39C0
-};
+	bool hostMigrationActive; //0x39C0
+	int hostMigrationStart; //0x39C4
+	struct actorAntilagFrame_t
+	{
+		vec3_t position[32]; //0x0
+		vec3_t angles[32]; //0x180
+		char useCount[32]; //0x300
+		char inUse[32]; //0x320
+		int time; //0x340
+	}actorAntilagFrames[20]; //0x39C8
+	int nextActorAntilagFrame; //0x7B18
+	struct vehicleAntilagFrame_t
+	{
+		vec3_t position[16]; //0x0
+		vec3_t angles[16]; //0xC0
+		char useCount[16]; //0x180
+		char inUse[16]; //0x190
+		int time; //0x1A0
+	}vehicleAntilagFrames[20]; //0x7B1C
+	int nextVehicleAntilagFrame; //0x9BEC
+	struct ZBarrierType *zbarrierTypes[255]; //0x9BF0
+}; //0xA000
 
 struct TurretInfo
 {
 		char unk_0[8]; //0x0
 	int flags; //0x8
-		char unk_C[0x8D4]; //0xC
+		char unk_C[0x110]; //0xC
 };
 
 struct scr_vehicle_s
@@ -525,6 +591,134 @@ struct scr_vehicle_s
 		char pad[0x1C00]; //0x660
 };
 
+enum he_type_t
+{
+	HE_TYPE_FREE = 0x0,
+	HE_TYPE_TEXT = 0x1,
+	HE_TYPE_VALUE = 0x2,
+	HE_TYPE_PLAYERNAME = 0x3,
+	HE_TYPE_MAPNAME = 0x4,
+	HE_TYPE_GAMETYPE = 0x5,
+	HE_TYPE_DAMAGE_INDICATOR = 0x6,
+	HE_TYPE_SCORE = 0x7,
+	HE_TYPE_MATERIAL = 0x8,
+	HE_TYPE_TIMER_DOWN = 0x9,
+	HE_TYPE_TIMER_UP = 0xA,
+	HE_TYPE_TENTHS_TIMER_DOWN = 0xB,
+	HE_TYPE_TENTHS_TIMER_UP = 0xC,
+	HE_TYPE_CLOCK_DOWN = 0xD,
+	HE_TYPE_CLOCK_UP = 0xE,
+	HE_TYPE_WAYPOINT = 0xF,
+	HE_TYPE_PERKS = 0x10,
+	HE_TYPE_COUNT = 0x11,
+};
+
+enum he_font_t
+{
+	HE_FONT_DEFAULT = 0x0,
+	HE_FONT_BIGFIXED = 0x1,
+	HE_FONT_SMALLFIXED = 0x2,
+	HE_FONT_OBJECTIVE = 0x3,
+	HE_FONT_BIG = 0x4,
+	HE_FONT_SMALL = 0x5,
+	HE_FONT_EXTRABIG = 0x6,
+	HE_FONT_EXTRASMALL = 0x7,
+	HE_FONT_COUNT = 0x8,
+};
+
+enum hudelem_flag_t
+{
+	HUDELEMFLAG_FOREGROUND = 0x1,
+	HUDELEMFLAG_HIDEWHENDEAD = 0x2,
+	HUDELEMFLAG_HIDEWHENINMENU = 0x4,
+	HUDELEMFLAG_FONTSTYLE3D_SHADOWED = 0x8,
+	HUDELEMFLAG_FONTSTYLE3D_SHADOWED_MORE = 0x10,
+	HUDELEMFLAG_FONT3D_USE_GLOWCOLOR = 0x20,
+	HUDELEMFLAG_HIDEWHENINKILLCAM = 0x40,
+	HUDELEMFLAG_REDACT = 0x80,
+	HUDELEMFLAG_FADEWHENTARGETED = 0x100,
+	HUDELEMFLAG_HIDEWHENINDEMO = 0x200,
+	HUDELEMFLAG_HIDEWHILEREMOTECONTROLING = 0x400,
+	HUDELEMFLAG_COD7DECODE = 0x800,
+	HUDELEMFLAG_NO_OFFSCREEN_WAYPOINT = 0x1000,
+	HUDELEMFLAG_HIDEWHENINSCOPE = 0x2000,
+	HUDELEMFLAG_TYPEWRITER = 0x4000,
+	HUDELEMFLAG_IMMUNE_TO_DEMO_GAMEHUD_SETTINGS = 0x8000,
+	HUDELEMFLAG_IMMUNE_TO_DEMO_FREECAMERA = 0x10000,
+	HUDELEMFLAG_DEBUG = 0x20000,
+	HUDELEMFLAGBITS = 0x12,
+};
+
+union hudelem_color_t
+{
+	struct
+	{
+		char r;
+		char g;
+		char b;
+		char a;
+	};
+	int rgba;
+};
+
+struct hudelem_s
+{
+	float x;//0x0
+	float y;//0x4
+	float z;//0x8
+	float fontScale;//0xC
+	float fromFontScale;//0x10
+	int fontScaleStartTime;//0x14
+	hudelem_color_t color;//0x18
+	hudelem_color_t fromColor;//0x1C
+	int fadeStartTime;//0x20
+	int scaleStartTime;//0x24
+	float fromX;//0x28
+	float fromY;//0x2C
+	int moveStartTime;//0x30
+	int time;//0x34
+	int duration;//0x38
+	float value;//0x3C
+	float sort;//0x40
+	hudelem_color_t glowColor;//0x44
+	int fxBirthTime;//0x48
+	int flags;//0x4C
+	short targetEntNum;//0x50
+	short fontScaleTime;//0x52
+	short fadeTime;//0x54
+	short label;//0x56
+	short width;//0x58
+	short height;//0x5A
+	short fromWidth;//0x5C
+	short fromHeight;//0x5E
+	short scaleTime;//0x60
+	short moveTime;//0x62
+	short text;//0x64
+	unsigned short fxLetterTime;//0x66
+	unsigned short fxDecayStartTime;//0x68
+	unsigned short fxDecayDuration;//0x6A
+	unsigned short fxRedactDecayStartTime;//0x6C
+	unsigned short fxRedactDecayDuration;//0x6E
+	char type;//0x70
+	char font;//0x71
+	char alignOrg;//0x72
+	char alignScreen;//0x73
+	char materialIndex;//0x74
+	char offscreenMaterialIdx;//0x75
+	char fromAlignOrg;//0x76
+	char fromAlignScreen;//0x77
+	char soundID;//0x78
+	char ui3dWindow;//0x79
+};
+
+struct game_hudelem_s
+{
+	hudelem_s elem;//0x0
+	int clientNum;//0x7C
+	int team;//0x80
+	int archived;//0x84
+};
+
 // g_items.cpp
 
 GAME_EXPORT void Add_Ammo(gentity_s* ent, int weaponIndex, int count, int fillclip);
@@ -563,6 +757,6 @@ extern  level_locals_t * level;
 
 extern gentity_s * g_entities;
 
-//extern game_hudelem_s * g_hudelems;
+extern game_hudelem_s * g_hudelems;
 
 #endif /* __G_LOCAL_H__ */

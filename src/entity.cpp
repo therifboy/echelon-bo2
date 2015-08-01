@@ -56,7 +56,8 @@ void playerLinkTo(gentity_s* ent, gentity_s* parent, uint16_t tag)
 	cl->link_viewClamp.max.current[1] =
 	cl->link_viewClamp.max.goal[0] =
 	cl->link_viewClamp.max.goal[1] = 180;
-	printf("G_EntLinkTo(): %08x\n", G_EntLinkTo(ent, parent, tag));
+	int ret = G_EntLinkTo(ent, parent, tag);
+	DBGPRINTF("G_EntLinkTo(): %08x\n", ret);
 }
 
 void playerLinkTo(gentity_s* ent, gentity_s* parent, uint16_t tag, const vec3_t originOffset)
@@ -79,7 +80,8 @@ void playerLinkTo(gentity_s* ent, gentity_s* parent, uint16_t tag, const vec3_t 
 	cl->link_viewClamp.max.current[1] =
 	cl->link_viewClamp.max.goal[0] =
 	cl->link_viewClamp.max.goal[1] = 180;
-	printf("G_EntLinkToWithOffset(): %08x\n", G_EntLinkToWithOffset(ent, parent, tag, originOffset, angleOffset));
+	int ret = G_EntLinkToWithOffset(ent, parent, tag, originOffset, angleOffset);
+	DBGPRINTF("G_EntLinkToWithOffset(): %08x\n", ret);
 }
 
 void unlink(gentity_s* ent)
@@ -126,8 +128,9 @@ gentity_s* spawnPlane(gentity_s* owner, ScriptString classname, const vec3_t sta
 	VectorCopy(startpoint, plane->r.currentOrigin);
 	plane->s.eType = ET_PLANE;
 	plane->spawnflags = 0;
-	plane->s.lerp.faction = owner->client->sess.cs.team | (owner->s.number * 0x800);
-	printf("G_CallSpawnEntity(): %d\n", G_CallSpawnEntity(plane));
+	plane->s.lerp.faction.teamAndOwnerIndex = owner->client->sess.cs.team | (owner->s.number << 11);
+	int ret = G_CallSpawnEntity(plane);
+	DBGPRINTF("G_CallSpawnEntity(): %d\n", ret);
 	Scr_AddEntity(SCRIPTINSTANCE_SERVER, plane);
 	return plane;
 }
@@ -151,22 +154,22 @@ void moveAxis(gentity_s* ent, int32_t axis, vec_t value, vec_t pfTotalTime, vec_
 #ifdef _DEBUG
 	if (pfTotalTime <= 0)
 	{
-		printf("total time must be positive\n");
+		DBGPRINT("total time must be positive\n");
 		return;
 	}
 	if (pfAccelTime < 0)
 	{
-		printf("accel time must be nonnegative\n");
+		DBGPRINT("accel time must be nonnegative\n");
 		return;
 	}
 	if (pfDecelTime < 0)
 	{
-		printf("decel time must be nonnegative\n");
+		DBGPRINT("decel time must be nonnegative\n");
 		return;
 	}
 	if (pfAccelTime + pfDecelTime > pfTotalTime)
 	{
-		printf("accel time plus decel time is greater than total time\n");
+		DBGPRINT("accel time plus decel time is greater than total time\n");
 		return;
 	}
 #endif
@@ -182,22 +185,22 @@ void moveTo(gentity_s* ent, const vec3_t vPos, vec_t pfTotalTime, vec_t pfAccelT
 #ifdef _DEBUG
 	if (pfTotalTime <= 0)
 	{
-		printf("total time must be positive\n");
+		DBGPRINT("total time must be positive\n");
 		return;
 	}
 	if (pfAccelTime < 0)
 	{
-		printf("accel time must be nonnegative\n");
+		DBGPRINT("accel time must be nonnegative\n");
 		return;
 	}
 	if (pfDecelTime < 0)
 	{
-		printf("decel time must be nonnegative\n");
+		DBGPRINT("decel time must be nonnegative\n");
 		return;
 	}
 	if (pfAccelTime + pfDecelTime > pfTotalTime)
 	{
-		printf("accel time plus decel time is greater than total time\n");
+		DBGPRINT("accel time plus decel time is greater than total time\n");
 		return;
 	}
 #endif
@@ -210,22 +213,22 @@ void rotateAxis(gentity_s* ent, int32_t axis, vec_t value, vec_t pfTotalTime, ve
 #ifdef _DEBUG
 	if (pfTotalTime <= 0)
 	{
-		printf("total time must be positive\n");
+		DBGPRINT("total time must be positive\n");
 		return;
 	}
 	if (pfAccelTime < 0)
 	{
-		printf("accel time must be nonnegative\n");
+		DBGPRINT("accel time must be nonnegative\n");
 		return;
 	}
 	if (pfDecelTime < 0)
 	{
-		printf("decel time must be nonnegative\n");
+		DBGPRINT("decel time must be nonnegative\n");
 		return;
 	}
 	if (pfAccelTime + pfDecelTime > pfTotalTime)
 	{
-		printf("accel time plus decel time is greater than total time\n");
+		DBGPRINT("accel time plus decel time is greater than total time\n");
 		return;
 	}
 #endif
@@ -241,22 +244,22 @@ void rotateTo(gentity_s* ent, const vec3_t vAngles, vec_t pfTotalTime, vec_t pfA
 #ifdef _DEBUG
 	if (pfTotalTime <= 0)
 	{
-		printf("total time must be positive\n");
+		DBGPRINT("total time must be positive\n");
 		return;
 	}
 	if (pfAccelTime < 0)
 	{
-		printf("accel time must be nonnegative\n");
+		DBGPRINT("accel time must be nonnegative\n");
 		return;
 	}
 	if (pfDecelTime < 0)
 	{
-		printf("decel time must be nonnegative\n");
+		DBGPRINT("decel time must be nonnegative\n");
 		return;
 	}
 	if (pfAccelTime + pfDecelTime > pfTotalTime)
 	{
-		printf("accel time plus decel time is greater than total time\n");
+		DBGPRINT("accel time plus decel time is greater than total time\n");
 		return;
 	}
 #endif
@@ -320,8 +323,7 @@ gentity_s* dropWeapon(int32_t client, int32_t weapon, int32_t camo)
 {
 	uint16_t tag = scr_const->tag_weapon_right;
 	gentity_s* ent = Drop_Item(&g_entities[client], weapon, 20, tag, 0);
-	*(int32_t*)((uint32_t)ent + 0x22C) = 999;
-	*(int32_t*)((uint32_t)ent + 0x230) = 999;
+	ent->item[0].ammoCount = ent->item[0].clipAmmoCount = 999;
 	ent->s.renderOptions = camo;
 	Scr_AddEntity(SCRIPTINSTANCE_SERVER, ent);
 	return ent;
@@ -329,8 +331,8 @@ gentity_s* dropWeapon(int32_t client, int32_t weapon, int32_t camo)
 
 void setOwner(gentity_s* ent, gentity_s* owner)
 {
-	int32_t ownerNum = owner->s.number;
-	ent->s.lerp.faction = (ent->s.lerp.faction & 0xF) | (ownerNum << 4);
+	int32_t ownerIdx = owner->client - level->clients;
+	ent->s.lerp.faction.teamAndOwnerIndex = (ent->s.lerp.faction.teamAndOwnerIndex & 0xF) | (ownerIdx << 4);
 }
 
 void useVehicle(gentity_s* vehicle, gentity_s* owner, int32_t seatId)
@@ -358,7 +360,8 @@ void playerDamage(gentity_s* self, gentity_s* attacker, int32_t damage, meansOfD
 	Scr_AddConstString(SCRIPTINSTANCE_SERVER, G_GetHitLocationString(hitLoc)); //hitLoc
 	Scr_AddUndefined(SCRIPTINSTANCE_SERVER); //vDir
 	Scr_AddUndefined(SCRIPTINSTANCE_SERVER); //vPoint
-	printf("weaponName: %s\n", BG_WeaponName(weapon, weapName, sizeof(weapName)));
+	BG_WeaponName(weapon, weapName, sizeof(weapName));
+	DBGPRINTF("weaponName: %s\n", weapName);
 	Scr_AddString(SCRIPTINSTANCE_SERVER, weapName); //weapon
 	Scr_AddConstString(SCRIPTINSTANCE_SERVER, *modNames[mod]); //meansOfDeath
 	Scr_AddInt(SCRIPTINSTANCE_SERVER, 0); //dflags

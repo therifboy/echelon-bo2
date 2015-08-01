@@ -5,6 +5,7 @@
 #include "export.h"
 
 #ifdef _DEBUG
+#define DBGPRINT(x)				printf(x)
 #define DBGPRINTF(x, ...)		printf(x, __VA_ARGS__)
 #else
 #define DBGPRINTF(x, ...)

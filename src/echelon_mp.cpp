@@ -714,7 +714,7 @@ void menuFunction::weapon_menu(modmenu_s* menu, int32_t client, int32_t scroll)
 		handleAllocTemp(client, menu, weaponDrop, 0);
 		break;
 	case 5:
-		Add_Ammo(self, self->client->ps.weapon, 999, 1);
+		Add_Ammo(self, gclient->ps.weapon, 999, 1);
 		break;
 	case 6:
 		for (int32_t i = 0; i < 0xF; i++)

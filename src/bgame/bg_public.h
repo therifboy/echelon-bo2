@@ -664,6 +664,159 @@ enum entityType_t
 	ET_ZBARRIER = 0x14,
 };
 
+//=============================================================================
+
+struct flame_timed_damage_t
+{
+	struct gentity_s *attacker; //0x0
+	int damage; //0x4
+	float damageDuration; //0x8
+	float damageInterval; //0xC
+	int start_timestamp; //0x10
+	int end_timestamp; //0x14
+	int lastupdate_timestamp; //0x18
+}; //0x1C
+
+struct item_ent_t
+{
+	int ammoCount; //0x0
+	int clipAmmoCount; //0x4
+	unsigned int weapon; //0x8
+}; //0xC
+
+struct trigger_ent_t
+{
+	int threshold; //0x0
+	int accumulate; //0x4
+	int timestamp; //0x8
+	int singleUserEntIndex; //0xC
+	char perk; //0x10
+	bool requireLookAt; //0x11
+	bool ignoreTeam; //0x12
+	bool excludeTeam; //0x13
+	int exposureIndex; //0x14
+	float exposureLerpToLighter; //0x18
+	float exposureLerpToDarker; //0x1C
+	vec3_t exposureFeather; //0x20
+}; //0x2C
+
+struct mover_positions_t
+{
+	float decelTime; //0x0
+	float speed; //0x4
+	float midTime; //0x8
+	vec3_t pos1; //0xC
+	vec3_t pos2; //0x18
+	vec3_t pos3; //0x24
+}; //0x30
+
+struct mover_slidedata_t
+{
+	vec3_t mins; //0x0
+	vec3_t maxs; //0xC
+	vec3_t velocity; //0x18
+}; //0x24
+
+struct mover_ent_t
+{
+	union
+	{
+		mover_positions_t pos; //0x0
+		mover_slidedata_t slide; //0x0
+	};
+	mover_positions_t angle; //0x30
+}; //0x60
+
+struct corpse_ent_t
+{
+	int deathAnimStartTime; //0x0
+}; //0x4
+
+enum MissileStage
+{
+	MISSILESTAGE_SOFTLAUNCH = 0x0,
+	MISSILESTAGE_ASCENT = 0x1,
+	MISSILESTAGE_DESCENT = 0x2,
+};
+
+enum MissileFlightMode
+{
+	MISSILEFLIGHTMODE_TOP = 0x0,
+	MISSILEFLIGHTMODE_DIRECT = 0x1,
+};
+
+struct missile_ent_t
+{
+	int timestamp; //0x0
+	float time; //0x4
+	int timeOfBirth; //0x8
+	float travelDist; //0xC
+	vec3_t surfaceNormal; //0x10
+	team_t team; //0x1C
+	char flags; //0x20
+	int antilagTimeOffset; //0x24
+	int timeAlive; //0x28
+	float airburstActivationDistance; //0x2C
+	union
+	{
+		struct
+		{
+			vec3_t curvature; //0x30
+			vec3_t targetOffset; //0x3C
+			MissileStage stage; //0x48
+			MissileFlightMode flightMode; //0x4C
+		}missile;
+		struct
+		{
+			int effectIndex; //0x30
+		}grenade;
+	};
+	int forcedDud; //0x50
+	float grenadeWobbleCycle; //0x54
+	float grenadeCurve; //0x58
+	int destructibleBounceCount; //0x5C
+}; //0x60
+
+struct blend_ent_t
+{
+	vec3_t pos; //0x0
+	vec3_t vel; //0xC
+	vec4_t viewQuat; //0x18
+	bool changed; //0x24
+	float posAccelTime; //0x28
+	float posDecelTime; //0x2C
+	float angleAccelTime; //0x30
+	float angleDecelTime; //0x34
+	float startTime; //0x38
+	float posTotalTime; //0x3C
+	float angleTotalTime; //0x40
+}; //0x44
+
+struct actor_ent_t
+{
+	int spawnTime; //0x0
+	struct animscripted_t *scripted; //0x4
+}; //0x8
+
+struct spawner_ent_t
+{
+	int team; //0x0
+	int timestamp; //0x4
+}; //0x8
+
+struct zbarrier_piece_t
+{
+	char state; //0x0
+	char scalar; //0x1
+	char nextState; //0x2
+	int startTime; //0x4
+}; //0x8
+
+struct zbarrier_ent_t
+{
+	zbarrier_piece_t pieces[6]; //0x0
+}; //0x30
+
 // bg_perks.cpp
 
 GAME_EXPORT int BG_GetPerkIndexForName(const char* perk);

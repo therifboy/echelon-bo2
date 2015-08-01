@@ -17,6 +17,6 @@ struct entityShared_t
 	float currentAngles[3]; //0x48
 	int ownerNum; //0x54
 	int eventTime; //0x58
-};
+}; //0x5C
 
 #endif /* __G_PUBLIC_H__ */

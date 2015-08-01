@@ -1,22 +1,21 @@
 #include "hud.h"
-#include "game/g_local.h"
 #include "game_mp/g_local_mp.h"
 
 #include <string.h>
 
-inline hudElement* hudElement::G_HudElems(int index)
+inline game_hudelem_s* G_HudElems(int index)
 {
-	return (hudElement*)(&g_hudelems[index]);
+	return &g_hudelems[index];
 }
 
-hudElement* hudElement::HudElem_Alloc(int client, he_type_t type)
+game_hudelem_s* HudElem_Alloc(int client, he_type_t type)
 {
-	hudElement* hud;
+	game_hudelem_s* hud;
 	if (client == 0x3FF)
 	{
 		for (int index = 1008; index < 1024; index++)
 		{
-			if ((hud = G_HudElems(index))->elem.type == FREE)
+			if ((hud = G_HudElems(index))->elem.type == HE_TYPE_FREE)
 			{
 				hud->elem.type = type;
 				hud->elem.targetEntNum = hud->clientNum = client;
@@ -30,7 +29,7 @@ hudElement* hudElement::HudElem_Alloc(int client, he_type_t type)
 	{
 		for (int index = client * 84; index < ((client + 1) * 84); index++)
 		{
-			if ((hud = G_HudElems(index))->elem.type == FREE)
+			if ((hud = G_HudElems(index))->elem.type == HE_TYPE_FREE)
 			{
 				hud->elem.type = type;
 				hud->elem.targetEntNum = hud->clientNum = client;
@@ -44,9 +43,9 @@ hudElement* hudElement::HudElem_Alloc(int client, he_type_t type)
 	return HudElem_Alloc(client, type);
 }
 
-hudElement* hudElement::SetShader(int client, const char* material, hudelem_color_t color, short width, short height, float x, float y)
+game_hudelem_s* SetShader(int client, const char* material, hudelem_color_t color, short width, short height, float x, float y)
 {
-	hudElement* elem = HudElem_Alloc(client, SHADER);
+	game_hudelem_s* elem = HudElem_Alloc(client, HE_TYPE_MATERIAL);
 	elem->elem.materialIndex = G_MaterialIndex(material);
 	elem->elem.color = color;
 	elem->elem.width = width;
@@ -56,9 +55,9 @@ hudElement* hudElement::SetShader(int client, const char* material, hudelem_colo
 	return elem;
 }
 
-hudElement* hudElement::SetShader(int client, int material, hudelem_color_t color, short width, short height, float x, float y)
+game_hudelem_s* SetShader(int client, int material, hudelem_color_t color, short width, short height, float x, float y)
 {
-	hudElement* elem = HudElem_Alloc(client, SHADER);
+	game_hudelem_s* elem = HudElem_Alloc(client, HE_TYPE_MATERIAL);
 	elem->elem.materialIndex = material;
 	elem->elem.color = color;
 	elem->elem.width = width;
@@ -68,9 +67,9 @@ hudElement* hudElement::SetShader(int client, int material, hudelem_color_t colo
 	return elem;
 }
 
-hudElement* hudElement::SetText(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, float x, float y)
+game_hudelem_s* SetText(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, float x, float y)
 {
-	hudElement* elem = HudElem_Alloc(client, TEXT);
+	game_hudelem_s* elem = HudElem_Alloc(client, HE_TYPE_TEXT);
 	elem->elem.text = G_LocalizedStringIndex(text);
 	elem->elem.color = color;
 	elem->elem.glowColor = glowColor;
@@ -81,9 +80,9 @@ hudElement* hudElement::SetText(int client, const char* text, hudelem_color_t co
 	return elem;
 }
 
-hudElement* hudElement::SetText(int client, int text, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, float x, float y)
+game_hudelem_s* SetText(int client, int text, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, float x, float y)
 {
-	hudElement* elem = HudElem_Alloc(client, TEXT);
+	game_hudelem_s* elem = HudElem_Alloc(client, HE_TYPE_TEXT);
 	elem->elem.text = text;
 	elem->elem.color = color;
 	elem->elem.glowColor = glowColor;
@@ -94,27 +93,27 @@ hudElement* hudElement::SetText(int client, int text, hudelem_color_t color, hud
 	return elem;
 }
 
-void hudElement::ClearAll(int client)
+void ClearAll(int client)
 {
 	if (client == 0x3FF)
     {
         for (int index = 1008; index < 1024; index++)
         {
-			memset((void*)G_HudElems(index), 0, sizeof(hudElement));
+			memset((void*)G_HudElems(index), 0, sizeof(game_hudelem_s));
         }
     }
     else
     {
         for (int index = client * 84; index < ((client + 1) * 84); index++)
         {
-			memset((void*)G_HudElems(index), 0, sizeof(hudElement));
+			memset((void*)G_HudElems(index), 0, sizeof(game_hudelem_s));
         }
     }
 }
 
-hudElement* hudElement::SetFx(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, short letterTime, short decayStartTime, short decayDuration, int levelTime, int flags)
+game_hudelem_s* SetFx(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, short letterTime, short decayStartTime, short decayDuration, int levelTime, int flags)
 {
-	hudElement* elem = SetText(client, text, color, glowColor, font, fontScale, 180 - strlen(text), 125);
+	game_hudelem_s* elem = SetText(client, text, color, glowColor, font, fontScale, 180 - strlen(text), 125);
 	elem->elem.fxBirthTime = (levelTime == -1 ? level->time : levelTime);
 	elem->elem.fxLetterTime = letterTime;
 	elem->elem.fxDecayStartTime = decayStartTime;
@@ -123,9 +122,9 @@ hudElement* hudElement::SetFx(int client, const char* text, hudelem_color_t colo
 	return elem;
 }
 
-hudElement* hudElement::SetWayPoint(const char* material, hudelem_color_t color, int team, float x, float y, float z)
+game_hudelem_s* SetWayPoint(const char* material, hudelem_color_t color, int team, float x, float y, float z)
 {
-	hudElement* elem = HudElem_Alloc(0x3FF, WAY_POINT);
+	game_hudelem_s* elem = HudElem_Alloc(0x3FF, HE_TYPE_WAYPOINT);
 	elem->elem.offscreenMaterialIdx = G_MaterialIndex(material);
 	elem->elem.x = x;
 	elem->elem.y = y;
@@ -135,9 +134,9 @@ hudElement* hudElement::SetWayPoint(const char* material, hudelem_color_t color,
 	return elem;
 }
 
-hudElement* hudElement::SetWayPoint(int material, hudelem_color_t color, int team, float x, float y, float z)
+game_hudelem_s* SetWayPoint(int material, hudelem_color_t color, int team, float x, float y, float z)
 {
-	hudElement* elem = HudElem_Alloc(0x3FF, WAY_POINT);
+	game_hudelem_s* elem = HudElem_Alloc(0x3FF, HE_TYPE_WAYPOINT);
 	elem->elem.offscreenMaterialIdx = material;
 	elem->elem.x = x;
 	elem->elem.y = y;
@@ -147,9 +146,9 @@ hudElement* hudElement::SetWayPoint(int material, hudelem_color_t color, int tea
 	return elem;
 }
 
-hudElement* hudElement::SetValue(int client, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, float value, float x, float y)
+game_hudelem_s* SetValue(int client, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, float value, float x, float y)
 {
-	hudElement* elem = HudElem_Alloc(client, VALUE);
+	game_hudelem_s* elem = HudElem_Alloc(client, HE_TYPE_VALUE);
 	elem->elem.color = color;
     elem->elem.glowColor = glowColor;
     elem->elem.value = value;
@@ -160,9 +159,9 @@ hudElement* hudElement::SetValue(int client, hudelem_color_t color, hudelem_colo
     return elem;
 }
 
-hudElement* hudElement::SetPlayerName(int client, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, int playerIndex, float x, float y)
+game_hudelem_s* SetPlayerName(int client, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, int playerIndex, float x, float y)
 {
-	hudElement* elem = HudElem_Alloc(client, PLAYER_NAME);
+	game_hudelem_s* elem = HudElem_Alloc(client, HE_TYPE_PLAYERNAME);
 	elem->elem.color = color;
 	elem->elem.glowColor = glowColor;
 	elem->elem.value = playerIndex;
@@ -173,216 +172,216 @@ hudElement* hudElement::SetPlayerName(int client, hudelem_color_t color, hudelem
 	return elem;
 }
 
-hudElement* hudElement::SetTypeWriter(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, short letterTime, short decayStartTime, short decayDuration, int levelTime)
+game_hudelem_s* SetTypeWriter(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, short letterTime, short decayStartTime, short decayDuration, int levelTime)
 {
-	hudElement* elem = SetFx(client, text, color, glowColor, font, fontScale, letterTime, decayStartTime, decayDuration, levelTime, 0x4000);
+	game_hudelem_s* elem = SetFx(client, text, color, glowColor, font, fontScale, letterTime, decayStartTime, decayDuration, levelTime, HUDELEMFLAG_TYPEWRITER);
 	return elem;
 }
 
-hudElement* hudElement::SetDecodeFx(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, font_t font, float fontScale, short letterTime, short decayStartTime, short decayDuration, int levelTime)
+game_hudelem_s* SetDecodeFx(int client, const char* text, hudelem_color_t color, hudelem_color_t glowColor, he_font_t font, float fontScale, short letterTime, short decayStartTime, short decayDuration, int levelTime)
 {
-	hudElement* elem = SetFx(client, text, color, glowColor, font, fontScale, letterTime, decayStartTime, decayDuration, levelTime, 0x4000);
+	game_hudelem_s* elem = SetFx(client, text, color, glowColor, font, fontScale, letterTime, decayStartTime, decayDuration, levelTime, HUDELEMFLAG_COD7DECODE);
 	return elem;
 }
 
-void hudElement::FontScaleOverTime(short fontScaleDuration, float fontScale, int levelTime)
+void FontScaleOverTime(game_hudelem_s* elem, short fontScaleDuration, float fontScale, int levelTime)
 {
-	this->elem.fromFontScale = this->elem.fontScale;
-	this->elem.fontScale = fontScale;
-	this->elem.fontScaleTime = fontScaleDuration;
-	this->elem.fontScaleStartTime = (levelTime == -1 ? level->time : levelTime);
-	this->elem.fromAlignOrg = this->elem.alignOrg;
-	this->elem.fromAlignScreen = this->elem.alignScreen;
+	elem->elem.fromFontScale = elem->elem.fontScale;
+	elem->elem.fontScale = fontScale;
+	elem->elem.fontScaleTime = fontScaleDuration;
+	elem->elem.fontScaleStartTime = (levelTime == -1 ? level->time : levelTime);
+	elem->elem.fromAlignOrg = elem->elem.alignOrg;
+	elem->elem.fromAlignScreen = elem->elem.alignScreen;
 }
 
-void hudElement::ScaleOverTime(short scaleDuration, short width, short height, int levelTime)
+void ScaleOverTime(game_hudelem_s* elem, short scaleDuration, short width, short height, int levelTime)
 {
-	this->elem.fromWidth = this->elem.width;
-	this->elem.fromHeight = this->elem.height;
-	this->elem.width = width;
-	this->elem.height = height;
-	this->elem.scaleTime = scaleDuration;
-	this->elem.scaleStartTime = (levelTime == -1 ? level->time : levelTime);
-	this->elem.fromAlignOrg = this->elem.alignOrg;
-	this->elem.fromAlignScreen = this->elem.alignScreen;
+	elem->elem.fromWidth = elem->elem.width;
+	elem->elem.fromHeight = elem->elem.height;
+	elem->elem.width = width;
+	elem->elem.height = height;
+	elem->elem.scaleTime = scaleDuration;
+	elem->elem.scaleStartTime = (levelTime == -1 ? level->time : levelTime);
+	elem->elem.fromAlignOrg = elem->elem.alignOrg;
+	elem->elem.fromAlignScreen = elem->elem.alignScreen;
 }
 
-void hudElement::MoveOverTime(short moveDuration, float x, float y, int levelTime)
+void MoveOverTime(game_hudelem_s* elem, short moveDuration, float x, float y, int levelTime)
 {
-	this->elem.fromX = this->elem.x;
-	this->elem.fromY = this->elem.y;
-	this->elem.x = x;
-	this->elem.y = y;
-	this->elem.moveTime = moveDuration;
-	this->elem.fromAlignScreen = this->elem.alignScreen;
-	this->elem.fromAlignOrg = this->elem.fromAlignOrg;
-	this->elem.moveStartTime = (levelTime == -1 ? level->time : levelTime);
-	this->elem.fromAlignOrg = this->elem.alignOrg;
-	this->elem.fromAlignScreen = this->elem.alignScreen;
+	elem->elem.fromX = elem->elem.x;
+	elem->elem.fromY = elem->elem.y;
+	elem->elem.x = x;
+	elem->elem.y = y;
+	elem->elem.moveTime = moveDuration;
+	elem->elem.fromAlignScreen = elem->elem.alignScreen;
+	elem->elem.fromAlignOrg = elem->elem.fromAlignOrg;
+	elem->elem.moveStartTime = (levelTime == -1 ? level->time : levelTime);
+	elem->elem.fromAlignOrg = elem->elem.alignOrg;
+	elem->elem.fromAlignScreen = elem->elem.alignScreen;
 }
 
-void hudElement::FadeOverTime(short fadeDuration, hudelem_color_t color, int levelTime)
+void FadeOverTime(game_hudelem_s* elem, short fadeDuration, hudelem_color_t color, int levelTime)
 {
-	this->elem.fromColor = this->elem.color;
-	this->elem.color = color;
-	this->elem.fadeTime = fadeDuration;
-	this->elem.fadeStartTime = (levelTime == -1 ? level->time : levelTime);
+	elem->elem.fromColor = elem->elem.color;
+	elem->elem.color = color;
+	elem->elem.fadeTime = fadeDuration;
+	elem->elem.fadeStartTime = (levelTime == -1 ? level->time : levelTime);
 }
 
-void hudElement::NullFx()
+void NullFx(game_hudelem_s* elem)
 {
-	this->elem.fadeStartTime = 0;
-	this->elem.fadeTime = 0;
-	this->elem.fontScaleStartTime = 0;
-	this->elem.fontScaleTime = 0;
-	this->elem.fxBirthTime = 0;
-	this->elem.fxDecayDuration = 0;
-	this->elem.fxDecayStartTime = 0;
-	this->elem.fxLetterTime = 0;
-	this->elem.fxRedactDecayDuration = 0;
-	this->elem.fxRedactDecayStartTime = 0;
-	this->elem.moveStartTime = 0;
-	this->elem.moveTime = 0;
-	this->elem.scaleStartTime = 0;
-	this->elem.scaleTime = 0;
-	this->elem.time = 0;
-	this->elem.duration = 0;
+	elem->elem.fadeStartTime =
+	elem->elem.fadeTime =
+	elem->elem.fontScaleStartTime =
+	elem->elem.fontScaleTime =
+	elem->elem.fxBirthTime =
+	elem->elem.fxDecayDuration =
+	elem->elem.fxDecayStartTime =
+	elem->elem.fxLetterTime =
+	elem->elem.fxRedactDecayDuration =
+	elem->elem.fxRedactDecayStartTime =
+	elem->elem.moveStartTime =
+	elem->elem.moveTime =
+	elem->elem.scaleStartTime =
+	elem->elem.scaleTime =
+	elem->elem.time =
+	elem->elem.duration = 0;
 }
 
-void hudElement::Clear()
+void ClearHud(game_hudelem_s* elem)
 {
-	memset(this, 0, sizeof(game_hudelem_s));
+	memset(elem, 0, sizeof(game_hudelem_s));
 }
 
-void hudElement::FadeWhenTargeted(bool value)
+void FadeWhenTargeted(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x100;
+		elem->elem.flags |= HUDELEMFLAG_FADEWHENTARGETED;
 	else
-		elem.flags &= ~0x100;
+		elem->elem.flags &= ~HUDELEMFLAG_FADEWHENTARGETED;
 }
 
-void hudElement::HideWhenDead(bool value)
+void HideWhenDead(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x2;
+		elem->elem.flags |= HUDELEMFLAG_HIDEWHENDEAD;
 	else
-		elem.flags &= ~0x2;
+		elem->elem.flags &= ~HUDELEMFLAG_HIDEWHENDEAD;
 }
 
-void hudElement::HideWhenInKillcam(bool value)
+void HideWhenInKillcam(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x40;
+		elem->elem.flags |= HUDELEMFLAG_HIDEWHENINKILLCAM;
 	else
-		elem.flags &= ~0x40;
+		elem->elem.flags &= ~HUDELEMFLAG_HIDEWHENINKILLCAM;
 }
 
-void hudElement::HideWhenInDemo(bool value)
+void HideWhenInDemo(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x200;
+		elem->elem.flags |= HUDELEMFLAG_HIDEWHENINDEMO;
 	else
-		elem.flags &= ~0x200;
+		elem->elem.flags &= ~HUDELEMFLAG_HIDEWHENINDEMO;
 }
 
-void hudElement::HideWhenInMenu(bool value)
+void HideWhenInMenu(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x4;
+		elem->elem.flags |= HUDELEMFLAG_HIDEWHENINMENU;
 	else
-		elem.flags &= ~0x4;
+		elem->elem.flags &= ~HUDELEMFLAG_HIDEWHENINMENU;
 }
 
-void hudElement::HideWhenInScope(bool value)
+void HideWhenInScope(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x2000;
+		elem->elem.flags |= HUDELEMFLAG_HIDEWHENINSCOPE;
 	else
-		elem.flags &= ~0x2000;
+		elem->elem.flags &= ~HUDELEMFLAG_HIDEWHENINSCOPE;
 }
 
-void hudElement::HideWhileRemoteControlling(bool value)
+void HideWhileRemoteControlling(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x400;
+		elem->elem.flags |= HUDELEMFLAG_HIDEWHILEREMOTECONTROLING;
 	else
-		elem.flags &= ~0x400;
+		elem->elem.flags &= ~HUDELEMFLAG_HIDEWHILEREMOTECONTROLING;
 }
 
-void hudElement::ForeGround(bool value)
+void ForeGround(game_hudelem_s* elem, bool value)
 {
 	if (value)
-		elem.flags |= 0x1;
+		elem->elem.flags |= HUDELEMFLAG_FOREGROUND;
 	else
-		elem.flags &= ~0x1;
+		elem->elem.flags &= ~HUDELEMFLAG_FOREGROUND;
 }
 
-void hudElement::Font(font_t font)
+void Font(game_hudelem_s* elem, he_font_t font)
 {
-	this->elem.font = font;
+	elem->elem.font = font;
 }
 
-void hudElement::AlignX(alignX_t align)
+void AlignX(game_hudelem_s* elem, alignX_t align)
 {
-	this->elem.alignOrg &= ~0xC;
-	this->elem.alignOrg |= (align << 2);
+	elem->elem.alignOrg &= ~0xC;
+	elem->elem.alignOrg |= (align << 2);
 }
 
-void hudElement::AlignY(alignY_t align)
+void AlignY(game_hudelem_s* elem, alignY_t align)
 {
-	this->elem.alignOrg &= ~0x3;
-	this->elem.alignOrg |= (align);
+	elem->elem.alignOrg &= ~0x3;
+	elem->elem.alignOrg |= (align);
 }
 
-void hudElement::HorzAlign(horzAlign_t align)
+void HorzAlign(game_hudelem_s* elem, horzAlign_t align)
 {
-	this->elem.alignScreen &= 0x0F;
-	this->elem.alignScreen |= (align << 4);
+	elem->elem.alignScreen &= 0x0F;
+	elem->elem.alignScreen |= (align << 4);
 }
 
-void hudElement::VertAlign(vertAlign_t align)
+void VertAlign(game_hudelem_s* elem, vertAlign_t align)
 {
-	this->elem.alignScreen &= 0xF0;
-	this->elem.alignScreen |= (align);
+	elem->elem.alignScreen &= 0xF0;
+	elem->elem.alignScreen |= (align);
 }
 
-bool hudElement::FadeWhenTargeted()
+bool FadeWhenTargeted(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x100);
+	return (elem->elem.flags & HUDELEMFLAG_FADEWHENTARGETED);
 }
 
-bool hudElement::HideWhenDead()
+bool HideWhenDead(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x2);
+	return (elem->elem.flags & HUDELEMFLAG_HIDEWHENDEAD);
 }
 
-bool hudElement::HideWhenInKillcam()
+bool HideWhenInKillcam(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x40);
+	return (elem->elem.flags & HUDELEMFLAG_HIDEWHENINKILLCAM);
 }
 
-bool hudElement::HideWhenInDemo()
+bool HideWhenInDemo(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x200);
+	return (elem->elem.flags & HUDELEMFLAG_HIDEWHENINDEMO);
 }
 
-bool hudElement::HideWhenInMenu()
+bool HideWhenInMenu(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x4);
+	return (elem->elem.flags & HUDELEMFLAG_HIDEWHENINMENU);
 }
 
-bool hudElement::HideWhenInScope()
+bool HideWhenInScope(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x2000);
+	return (elem->elem.flags & HUDELEMFLAG_HIDEWHENINSCOPE);
 }
 
-bool hudElement::HideWhileRemoteControlling()
+bool HideWhileRemoteControlling(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x400);
+	return (elem->elem.flags & HUDELEMFLAG_HIDEWHILEREMOTECONTROLING);
 }
 
-bool hudElement::ForeGround()
+bool ForeGround(game_hudelem_s* elem)
 {
-	return (elem.flags & 0x1);
+	return (elem->elem.flags & HUDELEMFLAG_FOREGROUND);
 }

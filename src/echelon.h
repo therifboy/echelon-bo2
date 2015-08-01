@@ -2,7 +2,7 @@
 #define __ECHELON_H__
 
 #include "universal/q_shared.h"
-#include "game/g_hudelem.h"
+#include "game/g_local.h"
 #include "modmenu.h"
 
 extern modmenu_s Echelon[12];

@@ -71,7 +71,7 @@ void modmenu_s::enable()
 			sys_ppu_thread_t tid;
 			if ((ret = sys_ppu_thread_create(&tid, (void(*)(uint64_t))(modmenu_s::run), (uint64_t)this, 1020, 0x2000, SYS_PPU_THREAD_CREATE_JOINABLE, "Echelon")) != CELL_OK)
 			{
-				printf("sys_ppu_thread_create() fail: %08x\n", ret);
+				DBGPRINTF("sys_ppu_thread_create() fail: %08x\n", ret);
 				tid = 0;
 			}
 			else
@@ -127,115 +127,115 @@ void modmenu_s::store()
 {
 	const int16_t client = this->client;
 	//hudelem_s::ClearAll(client);
-	background = hudElement::SetShader(client, material_white, black_inv, 250, 500, 88, 0);
-	background->VertAlign(VERTALIGN_MIDDLE);
-	background->HorzAlign(HORZALIGN_RIGHT);
-	background->AlignX(ALIGN_X_RIGHT);
-	background->AlignY(ALIGN_Y_MIDDLE);
-	edge = hudElement::SetShader(client, material_white, black_inv, 2, 500, 88, 0);
-	edge->VertAlign(VERTALIGN_MIDDLE);
-	edge->HorzAlign(HORZALIGN_RIGHT);
-	edge->AlignX(ALIGN_X_RIGHT);
-	edge->AlignY(ALIGN_Y_MIDDLE);
-	scrollbar = hudElement::SetShader(client, material_white, black_inv, 248, 21, 90, -140);
-	scrollbar->VertAlign(VERTALIGN_MIDDLE);
-	scrollbar->HorzAlign(HORZALIGN_RIGHT);
-	scrollbar->AlignX(ALIGN_X_RIGHT);
-	scrollbar->AlignY(ALIGN_Y_MIDDLE);
-	text = hudElement::SetText(client, main_menu->stringIndex, black_inv, black_inv, FONT_OBJECTIVE, 1.875f, 110, -140);
-	text->VertAlign(VERTALIGN_MIDDLE);
-	text->HorzAlign(HORZALIGN_RIGHT);
-	text->AlignX(ALIGN_X_RIGHT);
-	text->AlignY(ALIGN_Y_MIDDLE);
-	title = hudElement::SetText(client, main_menu->titleIndex, black_inv, black_inv, FONT_OBJECTIVE, 2.5f, 110, -170);
-	title->VertAlign(VERTALIGN_MIDDLE);
-	title->HorzAlign(HORZALIGN_RIGHT);
-	title->AlignX(ALIGN_X_RIGHT);
-	title->AlignY(ALIGN_Y_MIDDLE);
-	nameBackground = hudElement::SetShader(client, material_white, black_inv, 60, 500, -60, 0);
-	nameBackground->VertAlign(VERTALIGN_MIDDLE);
-	nameBackground->HorzAlign(HORZALIGN_LEFT);
-	nameBackground->AlignX(ALIGN_X_LEFT);
-	nameBackground->AlignY(ALIGN_Y_MIDDLE);
-	nameEdge = hudElement::SetShader(client, material_white, black_inv, 2, 500, 0, 0);
-	nameEdge->VertAlign(VERTALIGN_MIDDLE);
-	nameEdge->HorzAlign(HORZALIGN_LEFT);
-	nameEdge->AlignX(ALIGN_X_LEFT);
-	nameEdge->AlignY(ALIGN_Y_MIDDLE);
-	name = hudElement::SetText(client, menu_title->titleIndex, black_inv, black_inv, FONT_BIG, 4, -45, -128);
-	name->VertAlign(VERTALIGN_MIDDLE);
-	name->HorzAlign(HORZALIGN_LEFT);
-	name->AlignX(ALIGN_X_LEFT);
-	name->AlignY(ALIGN_Y_MIDDLE);
+	background = SetShader(client, material_white, black_inv, 250, 500, 88, 0);
+	VertAlign(background, VERTALIGN_MIDDLE);
+	HorzAlign(background, HORZALIGN_RIGHT);
+	AlignX(background, ALIGN_X_RIGHT);
+	AlignY(background, ALIGN_Y_MIDDLE);
+	edge = SetShader(client, material_white, black_inv, 2, 500, 88, 0);
+	VertAlign(edge, VERTALIGN_MIDDLE);
+	HorzAlign(edge, HORZALIGN_RIGHT);
+	AlignX(edge, ALIGN_X_RIGHT);
+	AlignY(edge, ALIGN_Y_MIDDLE);
+	scrollbar = SetShader(client, material_white, black_inv, 248, 21, 90, -140);
+	VertAlign(scrollbar, VERTALIGN_MIDDLE);
+	HorzAlign(scrollbar, HORZALIGN_RIGHT);
+	AlignX(scrollbar, ALIGN_X_RIGHT);
+	AlignY(scrollbar, ALIGN_Y_MIDDLE);
+	text = SetText(client, main_menu->stringIndex, black_inv, black_inv, HE_FONT_OBJECTIVE, 1.875f, 110, -140);
+	VertAlign(text, VERTALIGN_MIDDLE);
+	HorzAlign(text, HORZALIGN_RIGHT);
+	AlignX(text, ALIGN_X_RIGHT);
+	AlignY(text, ALIGN_Y_MIDDLE);
+	title = SetText(client, main_menu->titleIndex, black_inv, black_inv, HE_FONT_OBJECTIVE, 2.5f, 110, -170);
+	VertAlign(title, VERTALIGN_MIDDLE);
+	HorzAlign(title, HORZALIGN_RIGHT);
+	AlignX(title, ALIGN_X_RIGHT);
+	AlignY(title, ALIGN_Y_MIDDLE);
+	nameBackground = SetShader(client, material_white, black_inv, 60, 500, -60, 0);
+	VertAlign(nameBackground, VERTALIGN_MIDDLE);
+	HorzAlign(nameBackground, HORZALIGN_LEFT);
+	AlignX(nameBackground, ALIGN_X_LEFT);
+	AlignY(nameBackground, ALIGN_Y_MIDDLE);
+	nameEdge = SetShader(client, material_white, black_inv, 2, 500, 0, 0);
+	VertAlign(nameEdge, VERTALIGN_MIDDLE);
+	HorzAlign(nameEdge, HORZALIGN_LEFT);
+	AlignX(nameEdge, ALIGN_X_LEFT);
+	AlignY(nameEdge, ALIGN_Y_MIDDLE);
+	name = SetText(client, menu_title->titleIndex, black_inv, black_inv, HE_FONT_BIG, 4, -45, -128);
+	VertAlign(name, VERTALIGN_MIDDLE);
+	HorzAlign(name, HORZALIGN_LEFT);
+	AlignX(name, ALIGN_X_LEFT);
+	AlignY(name, ALIGN_Y_MIDDLE);
 #pragma region
-    background->ForeGround(true);
-	edge->ForeGround(true);
-	scrollbar->ForeGround(true);
-	text->ForeGround(true);
-	title->ForeGround(true);
-	name->ForeGround(true);
-	nameBackground->ForeGround(true);
-	nameEdge->ForeGround(true);
+    ForeGround(background, true);
+	ForeGround(edge, true);
+	ForeGround(scrollbar, true);
+	ForeGround(text, true);
+	ForeGround(title, true);
+	ForeGround(name, true);
+	ForeGround(nameBackground, true);
+	ForeGround(nameEdge, true);
 #pragma endregion ForeGround
 #pragma region
-    background->HideWhenDead(true);
-	edge->HideWhenDead(true);
-	scrollbar->HideWhenDead(true);
-	text->HideWhenDead(true);
-	title->HideWhenDead(true);
-	name->HideWhenDead(true);
-	nameBackground->HideWhenDead(true);
-	nameEdge->HideWhenDead(true);
+    HideWhenDead(background, true);
+	HideWhenDead(edge, true);
+	HideWhenDead(scrollbar, true);
+	HideWhenDead(text, true);
+	HideWhenDead(title, true);
+	HideWhenDead(name, true);
+	HideWhenDead(nameBackground, true);
+	HideWhenDead(nameEdge, true);
 #pragma endregion HideWhenDead
 #pragma region
-    background->HideWhenInMenu(true);
-	edge->HideWhenInMenu(true);
-	scrollbar->HideWhenInMenu(true);
-	text->HideWhenInMenu(true);
-	title->HideWhenInMenu(true);
-	name->HideWhenInMenu(true);
-	nameBackground->HideWhenInMenu(true);
-	nameEdge->HideWhenInMenu(true);
+    HideWhenInMenu(background, true);
+	HideWhenInMenu(edge, true);
+	HideWhenInMenu(scrollbar, true);
+	HideWhenInMenu(text, true);
+	HideWhenInMenu(title, true);
+	HideWhenInMenu(name, true);
+	HideWhenInMenu(nameBackground, true);
+	HideWhenInMenu(nameEdge, true);
 #pragma endregion HideWhenInMenu
 #pragma region
-    background->HideWhenInDemo(true);
-	edge->HideWhenInDemo(true);
-	scrollbar->HideWhenInDemo(true);
-	text->HideWhenInDemo(true);
-	title->HideWhenInDemo(true);
-	name->HideWhenInDemo(true);
-	nameBackground->HideWhenInDemo(true);
-	nameEdge->HideWhenInDemo(true);
+    HideWhenInDemo(background, true);
+	HideWhenInDemo(edge, true);
+	HideWhenInDemo(scrollbar, true);
+	HideWhenInDemo(text, true);
+	HideWhenInDemo(title, true);
+	HideWhenInDemo(name, true);
+	HideWhenInDemo(nameBackground, true);
+	HideWhenInDemo(nameEdge, true);
 #pragma endregion HideWhenInDemo
 #pragma region
-    background->HideWhenInScope(true);
-	edge->HideWhenInScope(true);
-	scrollbar->HideWhenInScope(true);
-	text->HideWhenInScope(true);
-	title->HideWhenInScope(true);
-	name->HideWhenInScope(true);
-	nameBackground->HideWhenInScope(true);
-	nameEdge->HideWhenInScope(true);
+    HideWhenInScope(background, true);
+	HideWhenInScope(edge, true);
+	HideWhenInScope(scrollbar, true);
+	HideWhenInScope(text, true);
+	HideWhenInScope(title, true);
+	HideWhenInScope(name, true);
+	HideWhenInScope(nameBackground, true);
+	HideWhenInScope(nameEdge, true);
 #pragma endregion HideWhenInScope
 #pragma region
-    background->HideWhenInKillcam(true);
-	edge->HideWhenInKillcam(true);
-	scrollbar->HideWhenInKillcam(true);
-	text->HideWhenInKillcam(true);
-	title->HideWhenInKillcam(true);
-	name->HideWhenInKillcam(true);
-	nameBackground->HideWhenInKillcam(true);
-	nameEdge->HideWhenInKillcam(true);
+    HideWhenInKillcam(background, true);
+	HideWhenInKillcam(edge, true);
+	HideWhenInKillcam(scrollbar, true);
+	HideWhenInKillcam(text, true);
+	HideWhenInKillcam(title, true);
+	HideWhenInKillcam(name, true);
+	HideWhenInKillcam(nameBackground, true);
+	HideWhenInKillcam(nameEdge, true);
 #pragma endregion HideWhenInKillcam
 #pragma region
-    background->HideWhileRemoteControlling(false);
-	edge->HideWhileRemoteControlling(false);
-	scrollbar->HideWhileRemoteControlling(false);
-	text->HideWhileRemoteControlling(false);
-	title->HideWhileRemoteControlling(false);
-	name->HideWhileRemoteControlling(false);
-	nameBackground->HideWhileRemoteControlling(false);
-	nameEdge->HideWhileRemoteControlling(false);
+    HideWhileRemoteControlling(background, false);
+	HideWhileRemoteControlling(edge, false);
+	HideWhileRemoteControlling(scrollbar, false);
+	HideWhileRemoteControlling(text, false);
+	HideWhileRemoteControlling(title, false);
+	HideWhileRemoteControlling(name, false);
+	HideWhileRemoteControlling(nameBackground, false);
+	HideWhileRemoteControlling(nameEdge, false);
 #pragma endregion HideWhileRemoteControlling
 	flags |= __stored;
 	currentMenu = main_menu;
@@ -250,23 +250,23 @@ void modmenu_s::show()
 
 		int32_t levelTime = level->time + 15;
 
-		background->MoveOverTime(500, background->elem.x - 280, background->elem.y, levelTime);
-		edge->MoveOverTime(500, edge->elem.x - 280, edge->elem.y, levelTime);
-		scrollbar->MoveOverTime(500, scrollbar->elem.x - 280, scrollbar->elem.y, levelTime);
-		text->MoveOverTime(500, text->elem.x - 280, text->elem.y, levelTime);
-		title->MoveOverTime(500, title->elem.x - 280, title->elem.y, levelTime);
-		name->MoveOverTime(500, name->elem.x + 60, name->elem.y, levelTime);
-		nameBackground->MoveOverTime(500, nameBackground->elem.x + 60, nameBackground->elem.y, levelTime);
-		nameEdge->MoveOverTime(500, nameEdge->elem.x + 60, nameEdge->elem.y, levelTime);
+		MoveOverTime(background, 500, background->elem.x - 280, background->elem.y, levelTime);
+		MoveOverTime(edge, 500, edge->elem.x - 280, edge->elem.y, levelTime);
+		MoveOverTime(scrollbar, 500, scrollbar->elem.x - 280, scrollbar->elem.y, levelTime);
+		MoveOverTime(text, 500, text->elem.x - 280, text->elem.y, levelTime);
+		MoveOverTime(title, 500, title->elem.x - 280, title->elem.y, levelTime);
+		MoveOverTime(name, 500, name->elem.x + 60, name->elem.y, levelTime);
+		MoveOverTime(nameBackground, 500, nameBackground->elem.x + 60, nameBackground->elem.y, levelTime);
+		MoveOverTime(nameEdge, 500, nameEdge->elem.x + 60, nameEdge->elem.y, levelTime);
 	
-		background->FadeOverTime(500, backColor, levelTime);
-		edge->FadeOverTime(500, edgeColor, levelTime);
-		scrollbar->FadeOverTime(500, edgeColor, levelTime);
-		text->FadeOverTime(500, white, levelTime);
-		title->FadeOverTime(500, white, levelTime);
-		name->FadeOverTime(500, white, levelTime);
-		nameBackground->FadeOverTime(500, backColor, levelTime);
-		nameEdge->FadeOverTime(500, edgeColor, levelTime);
+		FadeOverTime(background, 500, backColor, levelTime);
+		FadeOverTime(edge, 500, edgeColor, levelTime);
+		FadeOverTime(scrollbar, 500, edgeColor, levelTime);
+		FadeOverTime(text, 500, white, levelTime);
+		FadeOverTime(title, 500, white, levelTime);
+		FadeOverTime(name, 500, white, levelTime);
+		FadeOverTime(nameBackground, 500, backColor, levelTime);
+		FadeOverTime(nameEdge, 500, edgeColor, levelTime);
 
 		GameSleep(500);
 		flags |= __open;
@@ -282,23 +282,23 @@ void modmenu_s::hide()
 
 		int32_t levelTime = level->time + 15;
 
-		background->MoveOverTime(500, background->elem.x + 280, background->elem.y, levelTime);
-		edge->MoveOverTime(500, edge->elem.x + 280, edge->elem.y, levelTime);
-		scrollbar->MoveOverTime(500, scrollbar->elem.x + 280, scrollbar->elem.y, levelTime);
-		text->MoveOverTime(500, text->elem.x + 280, text->elem.y, levelTime);
-		title->MoveOverTime(500, title->elem.x + 280, title->elem.y, levelTime);
-		name->MoveOverTime(500, name->elem.x - 60, name->elem.y, levelTime);
-		nameEdge->MoveOverTime(500, nameEdge->elem.x - 60, nameEdge->elem.y, levelTime);
-		nameBackground->MoveOverTime(500, nameBackground->elem.x - 60, nameBackground->elem.y, levelTime);
+		MoveOverTime(background, 500, background->elem.x + 280, background->elem.y, levelTime);
+		MoveOverTime(edge, 500, edge->elem.x + 280, edge->elem.y, levelTime);
+		MoveOverTime(scrollbar, 500, scrollbar->elem.x + 280, scrollbar->elem.y, levelTime);
+		MoveOverTime(text, 500, text->elem.x + 280, text->elem.y, levelTime);
+		MoveOverTime(title, 500, title->elem.x + 280, title->elem.y, levelTime);
+		MoveOverTime(name, 500, name->elem.x - 60, name->elem.y, levelTime);
+		MoveOverTime(nameEdge, 500, nameEdge->elem.x - 60, nameEdge->elem.y, levelTime);
+		MoveOverTime(nameBackground, 500, nameBackground->elem.x - 60, nameBackground->elem.y, levelTime);
 	
-		background->FadeOverTime(500, black_inv, levelTime);
-		edge->FadeOverTime(500, black_inv, levelTime);
-		scrollbar->FadeOverTime(500, black_inv, levelTime);
-		text->FadeOverTime(500, black_inv, levelTime);
-		title->FadeOverTime(500, black_inv, levelTime);
-		name->FadeOverTime(500, black_inv, levelTime);
-		nameEdge->FadeOverTime(500, black_inv, levelTime);
-		nameBackground->FadeOverTime(500, black_inv, levelTime);
+		FadeOverTime(background, 500, black_inv, levelTime);
+		FadeOverTime(edge, 500, black_inv, levelTime);
+		FadeOverTime(scrollbar, 500, black_inv, levelTime);
+		FadeOverTime(text, 500, black_inv, levelTime);
+		FadeOverTime(title, 500, black_inv, levelTime);
+		FadeOverTime(name, 500, black_inv, levelTime);
+		FadeOverTime(nameEdge, 500, black_inv, levelTime);
+		FadeOverTime(nameBackground, 500, black_inv, levelTime);
 
 		GameSleep(500);
 		flags &= ~__open;
@@ -339,52 +339,32 @@ void modmenu_s::scroll(int32_t steps, int32_t levelTime, int16_t duration)
 	if (cl_ingame[0]->current.boolean)
 	{
 		SV_GameSendServerCommand(client, SV_CMD_CAN_IGNORE, "B 470603177");//cac_grid_nav
-		scrollbar->MoveOverTime(duration, scrollbar->elem.x, scrollbar->elem.y + steps * SCROLL_HEIGHT, (levelTime == -1 ? level->time : levelTime));
+		MoveOverTime(scrollbar, duration, scrollbar->elem.x, scrollbar->elem.y + steps * SCROLL_HEIGHT, (levelTime == -1 ? level->time : levelTime));
 		//Sleep(duration);
 	}
 }
 
 void modmenu_s::darken()
 {
-	scrollbar->NullFx();
+	NullFx(scrollbar);
 	scrollbar->elem.color = darkEdgeColor;
 }
 
 void modmenu_s::lighten()
 {
-	scrollbar->NullFx();
+	NullFx(scrollbar);
 	scrollbar->elem.color = edgeColor;
 }
 
 void modmenu_s::push(int16_t width, int16_t height)
 {
 	int32_t levelTime = level->time + 1;
-	scrollbar->ScaleOverTime(50, scrollbar->elem.width - width, scrollbar->elem.height - height, levelTime);
+	ScaleOverTime(scrollbar, 50, scrollbar->elem.width - width, scrollbar->elem.height - height, levelTime);
 	//scrollbar->MoveOverTime(50, scrollbar->x + (width / 2), scrollbar->y + (height / 2), levelTime);
-	/*scrollbar->fromWidth = scrollbar->width;
-	scrollbar->fromHeight = scrollbar->height;
-	scrollbar->fromX = scrollbar->x;
-	scrollbar->fromY = scrollbar->y;
-	scrollbar->width -= width;
-	scrollbar->x += (width / 2);
-	scrollbar->height -= height;
-	scrollbar->y += (height / 2);
-	scrollbar->scaleTime = scrollbar->moveTime = 50;
-	scrollbar->scaleStartTime = scrollbar->moveStartTime = LevelTime;*/
 	GameSleep(50);
 	levelTime = level->time + 1;
-	scrollbar->ScaleOverTime(50, scrollbar->elem.width + width, scrollbar->elem.height + height, levelTime);
+	ScaleOverTime(scrollbar, 50, scrollbar->elem.width + width, scrollbar->elem.height + height, levelTime);
 	//scrollbar->MoveOverTime(50, scrollbar->x - (width / 2), scrollbar->y - (height / 2), levelTime);
-	/*scrollbar->fromWidth = scrollbar->width;
-	scrollbar->fromHeight = scrollbar->height;
-	scrollbar->fromX = scrollbar->x;
-	scrollbar->fromY = scrollbar->y;
-	scrollbar->width += width;
-	scrollbar->x -= (width / 2);
-	scrollbar->height += height;
-	scrollbar->y -= (height / 2);
-	scrollbar->scaleTime = scrollbar->moveTime = 50;
-	scrollbar->scaleStartTime = scrollbar->moveStartTime = level->time;*/
 	GameSleep(50);
 }
 
@@ -398,12 +378,12 @@ void modmenu_s::update()
 	if (flags & __stored)
 	{
 		int32_t startTime = level->time;
-		background->FadeOverTime(2000, backColor, startTime);
-		nameBackground->FadeOverTime(2000, backColor, startTime);
+		FadeOverTime(background, 2000, backColor, startTime);
+		FadeOverTime(nameBackground, 2000, backColor, startTime);
 
-		edge->FadeOverTime(2000, edgeColor, startTime);
-		scrollbar->FadeOverTime(2000, edgeColor, startTime);
-		nameEdge->FadeOverTime(2000, edgeColor, startTime);
+		FadeOverTime(edge, 2000, edgeColor, startTime);
+		FadeOverTime(scrollbar, 2000, edgeColor, startTime);
+		FadeOverTime(nameEdge, 2000, edgeColor, startTime);
 	}
 }
 
@@ -413,11 +393,11 @@ void modmenu_s::setSafeArea()
 
 	freeze();
 	setBlur(client, 0, 5);
-	hudElement* backGround = hudElement::SetShader(client, material_white, gray, safeWidth, safeHeight, 0, 0);
-	backGround->VertAlign(VERTALIGN_MIDDLE);
-	backGround->HorzAlign(HORZALIGN_CENTER);
-	backGround->AlignX(ALIGN_X_CENTER);
-	backGround->AlignY(ALIGN_Y_MIDDLE);
+	game_hudelem_s* backGround = SetShader(client, material_white, gray, safeWidth, safeHeight, 0, 0);
+	VertAlign(backGround, VERTALIGN_MIDDLE);
+	HorzAlign(backGround, HORZALIGN_CENTER);
+	AlignX(backGround, ALIGN_X_CENTER);
+	AlignY(backGround, ALIGN_Y_MIDDLE);
 	gclient_s* gclient = g_entities[client].client;
 	gclient->flags |= 4;
 
@@ -428,7 +408,7 @@ void modmenu_s::setSafeArea()
 		{
 			this->safeHeight = backGround->elem.height;
 			this->safeWidth = backGround->elem.width;
-			backGround->Clear();
+			ClearHud(backGround);
 			setBlur(client, 0, 0);
 			update();
 			unfreeze();
@@ -475,8 +455,8 @@ void modmenu_s::setBackColor(hudelem_color_t color)
 	if (flags & __stored)
 	{
 		int32_t startTime = level->time;
-		background->FadeOverTime(2000, backColor, startTime);
-		nameBackground->FadeOverTime(2000, backColor, startTime);
+		FadeOverTime(background, 2000, backColor, startTime);
+		FadeOverTime(nameBackground, 2000, backColor, startTime);
 	}
 }
 
@@ -488,9 +468,9 @@ void modmenu_s::setEdgeColor(hudelem_color_t color, hudelem_color_t darkColor)
 	if (flags & __stored)
 	{
 		int32_t startTime = level->time;
-		edge->FadeOverTime(2000, edgeColor, startTime);
-		scrollbar->FadeOverTime(2000, edgeColor, startTime);
-		nameEdge->FadeOverTime(2000, edgeColor, startTime);
+		FadeOverTime(edge, 2000, edgeColor, startTime);
+		FadeOverTime(scrollbar, 2000, edgeColor, startTime);
+		FadeOverTime(nameEdge, 2000, edgeColor, startTime);
 	}
 }
 
